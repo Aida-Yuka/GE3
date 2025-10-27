@@ -1,3 +1,6 @@
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
 #include <Windows.h>
 #include <cstdint>
 #include <string>
@@ -22,6 +25,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
+#pragma comment(lib,"dinput8.lib")
 
 struct Matrix4x4 {
 	float m[4][4];
@@ -817,6 +821,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	assert(device != nullptr);
 	Log("Complete create D3D12Device!!!\n");
 
+	//==============
+	//DirectInputの初期化
+	IDirectInput8* directInput = nullptr;
+	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	assert(SUCCEEDED(hr));
+
+	//キーボードデバイスの生成
+	IDirectInputDevice8* keyboard = nullptr;
+	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+	assert(SUCCEEDED(hr));
+
+	//入力データ形式のセット
+	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);//標準形式
+	assert(SUCCEEDED(hr));
+
+	//排他制御レベルのセット
+	hr = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	assert(SUCCEEDED(hr));
+	//================
+
 #ifdef _DEBUG
 	ID3D12InfoQueue* infoQueue = nullptr;
 	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
@@ -1304,6 +1328,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
+
+			//==============
+			//キーボード情報の取得開始
+			keyboard->Acquire();
+
+			//全キーの入力状態を取得する
+			BYTE key[256] = {};
+			keyboard->GetDeviceState(sizeof(key), key);
+
+			//数字の0キーが押されていたら
+			if (key[DIK_0])
+			{
+				OutputDebugStringA("Hit0\n");
+			}
+
+			//==============
 
 			//色の変更機能
 			ImGui::Begin("Settings");
