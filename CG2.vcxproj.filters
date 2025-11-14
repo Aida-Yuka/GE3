@@ -16,6 +16,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{85adfc52-8e6f-464a-8364-544501b57a3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="リソース ファイル\shaders">
+      <UniqueIdentifier>{c787f130-0804-4d6a-8a46-bb6171543bf3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -47,12 +50,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Object3d.PS.hlsl" />
-    <FxCompile Include="Object3d.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
+      <Filter>リソース ファイル\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Object3d.VS.hlsl">
+      <Filter>リソース ファイル\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="Object3d.hlsli" />
+    <None Include="resources\shaders\Object3d.hlsli">
+      <Filter>リソース ファイル\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
