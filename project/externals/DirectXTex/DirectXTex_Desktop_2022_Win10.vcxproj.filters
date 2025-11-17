@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{d665bb3f-6d2a-415d-83f5-abd5c813962b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{1094e42c-64be-4df9-b52f-ecc61f584d83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="DirectXTex.h">
