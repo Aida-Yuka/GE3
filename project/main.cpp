@@ -13,6 +13,8 @@
 #include <fstream>
 #include <sstream>
 
+#include<iostream>
+
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -1316,24 +1318,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			//入力の更新
+			//キー入力の更新
 			input->Update();
 
-			////==============
-			////キーボード情報の取得開始
-			//keyboard->Acquire();
-
-			////全キーの入力状態を取得する
-			//BYTE key[256] = {};
-			//keyboard->GetDeviceState(sizeof(key), key);
-
-			////数字の0キーが押されていたら
-			//if (key[DIK_0])
-			//{
-			//	OutputDebugStringA("Hit0\n");
-			//}
-
-			////==============
+			//数字の0キーが押されていたら
+			//if (input->PushKey(DIK_0))
+			if(input->TriggerKey(DIK_A))
+			{
+				OutputDebugStringA("Hit0\n");
+			}
 
 			//色の変更機能
 			ImGui::Begin("Settings");
