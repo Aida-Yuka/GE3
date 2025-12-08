@@ -1,13 +1,38 @@
 #include "Input.h"
+#include <cassert>
 
-void Input::Initialzie()
+#pragma comment(lib,"dinput8.lib")
+#pragma comment(lib,"dxguid.lib")
+
+//初期化
+void Input::Initialzie(HINSTANCE hInstance,HWND hwnd)
 {
-	//Direct Input 初期化
+	//Direct Inputの初期化
 
+	//DirectInputのインスタンス生成
+	HRESULT result;
+
+	ComPtr<IDirectInput8> directInput = nullptr;
+	result = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	assert(SUCCEEDED(result));
+	//キーボードデバイス生成
+	result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+	assert(SUCCEEDED(result));
+	//入力データ形式のセット
+	result = keyboard->SetDataFormat(&c_dfDIKeyboard);
+	assert(SUCCEEDED(result));
+	//排他制御レベルのセット
+	result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	assert(SUCCEEDED(result));
 }
 
 void Input::Update()
 {
-	//キーボードの入力状態の更新
+	//===キーボードの入力状態の更新===//
 
+	//キーボード情報の取得開始
+	keyboard->Acquire();
+	//全キーの入力情報を取得
+	BYTE key[256] = {};
+	keyboard->GetDeviceState(sizeof(key), key);
 }

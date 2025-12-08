@@ -1,5 +1,4 @@
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
+#include "Input.h"
 
 #include <Windows.h>
 #include <cstdint>
@@ -25,7 +24,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
-#pragma comment(lib,"dinput8.lib")
+
 
 struct Matrix4x4 {
 	float m[4][4];
@@ -737,6 +736,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr
 	);
 
+	//ポインタ
+	Input* input = nullptr;
+
 	//デバッグレイヤー
 #ifdef _DEBUG
 	ID3D12Debug1* debugController = nullptr;
@@ -856,6 +858,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #endif
 
+	//入力の初期化
+	//WNDCLASS w{};
+	input = new Input();
+	input->Initialzie(wc.hInstance, hwnd);
+
 	//コマンドキューを生成する
 	ID3D12CommandQueue* commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
@@ -874,7 +881,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
 
 	assert(SUCCEEDED(hr));
-
+	
 	//スワップチェーンを生成する
 	IDXGISwapChain4* swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
@@ -1309,6 +1316,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
+			//入力の更新
+			input->Update();
+
 			////==============
 			////キーボード情報の取得開始
 			//keyboard->Acquire();
@@ -1521,6 +1531,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		indexResourceSprite->Release();
 		indexResourceSprite = nullptr;
 	}
+
+	//入力解放
+	delete input;
 
 #ifdef _DEBUG
 	debugController->Release();
