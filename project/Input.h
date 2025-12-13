@@ -6,6 +6,7 @@
 #include "Windows.h"
 #include <windows.h>
 #include <wrl.h>
+#include "windowsAPI.h"
 
 class Input
 {
@@ -31,7 +32,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialzie(HINSTANCE hInstance, HWND hwnd);
+	void Initialzie(WindowsAPI* windowsAPI);
 
 	/// <summary>
 	/// 更新
@@ -50,4 +51,7 @@ private://メンバ変数
 
 	//前回の全キーの状態
 	BYTE keyPre[256] = {};
+
+	//windowsAPI
+	WindowsAPI* windowsAPI_ = nullptr;
 };
