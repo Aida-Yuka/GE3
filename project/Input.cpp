@@ -5,7 +5,7 @@
 #pragma comment(lib,"dxguid.lib")
 
 //初期化
-void Input::Initialzie(WindowsAPI* windowsAPI)
+void Input::Initialize(WindowsAPI* windowsAPI)
 {
 	//Direct Inputの初期化
 

@@ -85,6 +85,7 @@ bool WindowsAPI::ProcessMessage()
 		DispatchMessage(&msg);
 	}
 	
+	//終了メッセージが来た時
 	if (msg.message == WM_QUIT)
 	{
 		return true;

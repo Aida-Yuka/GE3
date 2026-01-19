@@ -15,10 +15,10 @@ public:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 	/// <summary>
-/// キーの押下をチェック
-/// </summary>
-///<param name="keyNumber">キー番号</param>
-///<returns>押されているか</returns>
+	/// キーの押下をチェック
+	/// </summary>
+	///<param name="keyNumber">キー番号</param>
+	///<returns>押されているか</returns>
 	bool PushKey(BYTE keyNumber);
 
 	/// <summary>
@@ -32,7 +32,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialzie(WindowsAPI* windowsAPI);
+	void Initialize(WindowsAPI* windowsAPI);
 
 	/// <summary>
 	/// 更新
