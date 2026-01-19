@@ -10,23 +10,24 @@ env:
  #リポジトリのルートディレクトリを基点としたソリューションファイルのパス
  SOLUTION_FILE_PATH: project/CG2.sln
  #Visual Studio の構成(今回はデバッグ)
- CONFIGURATION:CONFIGURATION: Debug
-#何をするのか(今回はビルド)
+ CONFIGURATION: Debug
+#何をするのか(今回はビルド)、使用するOSは何か(今回はWindows)
 jobs:
  build:
   runs-on: windows-2022
+  
+  #実際の仕事を一つずつ区分け
 
   steps:
+     #一つ目チェックアウト
    - name: Checkout
      uses: actions/checkout@v4
+     #二つ目ビルドのバージョン指定
    - name: Add MSBuild to PATH
      uses: microsoft/setup-msbuild@v2
      with:
       msbuild-architecture: x64
+      #実際にビルド
    - name: Build
      run:
       msbuild ${{env.SOLUTION_FILE_PATH}} /p:Platform=x64,Configuration=${{env.CONFIGURATION}}
-
-
-
-      
