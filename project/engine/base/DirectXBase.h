@@ -91,7 +91,7 @@ public://メンバ変数
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
 
 	//スワップチェーン
-	Microsoft::WRL::ComPtr < IDXGISwapChain4> swapChain = nullptr;
+	Microsoft::WRL::ComPtr < IDXGISwapChain1> swapChain = nullptr;
 
 	//コマンドアロケータ
 	Microsoft::WRL::ComPtr < ID3D12CommandAllocator> commandAllocator = nullptr;
@@ -137,7 +137,7 @@ public://外部公開
 	/// <summary>
 	/// SRVの指定番号のGPUデスクリプタハンドルを取得する
 	/// </summary>
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVDGPUescriptorHandle(uint32_t index);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
 private://プライベート関数
 	//DirectX12デバイス
@@ -148,4 +148,14 @@ private://プライベート関数
 	
 	//WindowsAPI
 	WindowsAPI* windowsAPI = nullptr;
+
+	///<summary>
+	///指定番号のCPUデスクリプタハンドルを取得する
+	///</summary>
+	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
+
+	///<summary>
+	///指定番号のGPUデスクリプタハンドルを取得する
+	///</summary>
+	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
 };
