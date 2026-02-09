@@ -147,7 +147,6 @@ copy "$(windowsSdkDir)bin\$(targetPlatformVersion)\x64\dxil.dll" "$(targetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DIRECTXBASE.CPP" />
     <ClCompile Include="engine\base\DirectXBase.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />

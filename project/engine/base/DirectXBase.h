@@ -22,53 +22,10 @@ public://メンバ変数
 	//初期化
 	void Initialize(WindowsAPI* windowsAPI);
 
-	//デバイスの初期化
-	void DeviceInitialize();
-	
-	//コマンド関連の初期化
-	void CommandInitialize();
-	
-	//スワップチェーンの生成
-	void SwapChainGenerate();
-	
-	//深度バッファの生成
-	void DepthBufferGenerate();
-
-	//各種デスクリプタヒープの生成
-	void DescriptorHeapGenerate();
-	
-	//レンダーターゲットビューの初期化
-	void RenderTargetViewInitialize();
-
-	//フェンスの生成
-	void FenceGenerate();
-	
-	//ビューポート矩形の初期化
-	void ViewportInitialize();
-	
-	//シザリング矩形の初期化
-	void ScissorRectInitialize();
-	
-	//DXCコンパイラの生成
-	void DxcCompilerGenerate();
-	
-	//ImGuiの初期化
-	void ImGuiInitialize();
-
 	/// <summary>
 	/// デスクリプタヒープを生成する
 	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
-
-	/// <summary>
-	/// 指定番号のCPUデスクリプタハンドルを取得する
-	/// </summary>
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr < ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
-
-	/// <summary>
-	/// 指定番号のGPUデスクリプタハンドルを取得する
-	/// </summary>
-	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -76,15 +33,12 @@ public://メンバ変数
 	//RTV
 	//D3D12_CPU_DESCRIPTOR_HANDLE rtvDescriptorSize;
 	UINT rtvDescriptorSize = 0;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorSize = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
 	//SRV
 	UINT srvDescriptorSize = 0;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorSize = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 	//DSV
 	UINT dsvDescriptorSize = 0;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorSize = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
 
 	//スワップチェーンリソース
@@ -95,6 +49,7 @@ public://メンバ変数
 
 	//コマンドアロケータ
 	Microsoft::WRL::ComPtr < ID3D12CommandAllocator> commandAllocator = nullptr;
+	//commandAllocator = nullptr;
 	//コマンドリスト
 	Microsoft::WRL::ComPtr < ID3D12GraphicsCommandList> commandList = nullptr;
 	//コマンドキュー
@@ -140,6 +95,42 @@ public://外部公開
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
 private://プライベート関数
+	//デバイスの初期化
+	void DeviceInitialize();
+
+	//コマンド関連の初期化
+	void CommandInitialize();
+
+	//スワップチェーンの生成
+	void SwapChainGenerate();
+
+	//深度バッファの生成
+	void DepthBufferGenerate();
+
+	//各種デスクリプタヒープの生成
+	void DescriptorHeapGenerate();
+
+	//レンダーターゲットビューの初期化
+	void RenderTargetViewInitialize();
+
+	//深度ステンシルビューの初期化
+	void DepthStencilViewInitialize();
+
+	//フェンスの生成
+	void FenceGenerate();
+
+	//ビューポート矩形の初期化
+	void ViewportInitialize();
+
+	//シザリング矩形の初期化
+	void ScissorRectInitialize();
+
+	//DXCコンパイラの生成
+	void DxcCompilerGenerate();
+
+	//ImGuiの初期化
+	void ImGuiInitialize();
+
 	//DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
 

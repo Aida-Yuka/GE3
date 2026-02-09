@@ -62,9 +62,6 @@ public:
 	// X軸で回転
 	Matrix4x4 MakeRotateXMatrix(float radian);
 
-	// X軸で回転
-	Matrix4x4 MakeRotateXMatrix(float radian);
-
 	// Y軸で回転
 	Matrix4x4 MakeRotateYMatrix(float radian);
 
@@ -73,7 +70,6 @@ public:
 
 	// Affine変換
 	Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
-
 
 	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
 
