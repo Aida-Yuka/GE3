@@ -79,6 +79,12 @@ public://メンバ変数
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
 
+	//描画前処理
+	void PreDraw();
+
+	//描画後処理
+	void PostDraw();
+
 public://外部公開
 	/// <summary>
 	/// SRVの指定番号のCPUデスクリプタハンドルを取得する

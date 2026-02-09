@@ -411,3 +411,57 @@ void DirectXBase::Initialize(WindowsAPI * windowsAPI)
 	//ImGuiの初期化
 	ImGuiInitialize();
 }
+
+void DirectXBase::PreDraw()
+{
+	HRESULT hr{};
+
+	//===バックバッファの番号取得===
+	//これから書き込むバックバッファのインデックスを取得
+	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	//描画先のRTVを設定する
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+
+	//===リソースバリアで書き込み可能に変更===
+	//TransitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
+	//バリアのTransition
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	//Noneにしておく
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//バリアを張る対象のリソース。現在のバックバッファに対して行う
+	barrier.Transition.pResource = swapChainResources[backBufferIndex];
+	//遷移前(現在)のResourceState
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	//遷移後のResourceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//TransitionBarrierを張る
+	commandList->ResourceBarrier(1, &barrier);
+	
+	//===描画先のRTVとDSVを指定する===
+	//描画先のRTVとDSVを設定する
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+
+	//===画面全体の色をクリア===
+	//指定した色で画面全体をクリアにする
+	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//青っぽい色。RGBAの順番
+	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
+	//===画面全体の深度をクリア===
+	//指定した深度で画面全体をクリアする
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	
+	//===SRV用のデスクリプタヒープを指定する===
+	
+	//===ビューポート領域の設定===
+	commandList->viewport
+
+	//===シザー矩形の設定===
+	commandList->RSSetScrissorRects(1, &scrissorRect_);
+}
+
+void DirectXBase::PostDraw()
+{
+
+}
