@@ -170,21 +170,21 @@
 ////ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages,ID3D12Device* device,ID3D12GraphicsCommandList* commandList)
 //void UploadTextureData(ID3D12Resource* texture,const DirectX::ScratchImage& mipImages)
 //{
-//	//std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-//	//DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
-//	//uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
-//	//ID3D12Resource* intermediateResource = CreateBufferResource(device, intermediateSize);
-//	//UpdateSubresources(commandList, texture, intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
-//	////Texture転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
-//	//D3D12_RESOURCE_BARRIER barrier{};
-//	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-//	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-//	//barrier.Transition.pResource = texture;
-//	//barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-//	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-//	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-//	//commandList->ResourceBarrier(1, &barrier);
-//	//return intermediateResource;
+//	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+//	DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+//	uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
+//	ID3D12Resource* intermediateResource = CreateBufferResource(device, intermediateSize);
+//	UpdateSubresources(commandList, texture, intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
+//	//Texture転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
+//	D3D12_RESOURCE_BARRIER barrier{};
+//	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+//	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+//	barrier.Transition.pResource = texture;
+//	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+//	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+//	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+//	commandList->ResourceBarrier(1, &barrier);
+//	return intermediateResource;
 //
 //	//Meta情報を取得
 //	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -204,7 +204,7 @@
 //		assert(SUCCEEDED(hr));
 //	}
 //}
-//
+
 ////MaterialData構造体と読み込み関数
 //MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
 //{
@@ -541,18 +541,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//UploadTextureData(textureResource, mipImages);
 
 	//////ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
-	//////commandListをCloseし、commandQueue->CommandListsを使いキックする
-	////commandList->Close();
-	////ID3D12CommandList* commandLists[] = { commandList };
-	////commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-	//////実行を待つ
-
-	//////allocatorとcommandListResetして次のコマンドを積めるようにする
-	////hr = commandAllocator->Reset();
-	////assert(SUCCEEDED(hr));
-	////hr = commandList->Reset(commandAllocator, nullptr);
-	////assert(SUCCEEDED(hr));
-
+	
 	//////intermediateResouseをReleaseする
 	////intermediateResource->Release();
 
@@ -579,7 +568,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			break;
 		}
 
-		///ゲームの処理///
+		///===ゲームの処理===///
 
 	//	//フレームの開始
 	//	ImGui_ImplDX12_NewFrame();
@@ -627,91 +616,53 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowsAPI::kClientWidth), float(kClientHeight), 0.0f, 100.0f);
 	//	Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
 	//	*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;*/
-	
+
 	//	//ImGuiの内部コマンドを生成する
 	//	ImGui::Render();
 
-	
-	//	//描画先のRTVとDSVを設定する
-	//	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	//	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+	//描画前処理
+		dxBase->PreDraw();
 
-	//	//描画用のDescriptorHeapの設定
-	//	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
-	//	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+		// 
+		//	//コマンドを積む
+		//	commandList->SetGraphicsRootSignature(rootSignature);//RootSignatureを設定
+		//	commandList->SetPipelineState(graphicsPipelineState);//PSOを設定
+		//	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
+		//	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);//形状を設定
 
-	//	//コマンドを積む
-	//	commandList->RSSetViewports(1, &viewport);//Viewport
-	//	commandList->RSSetScissorRects(1, &scissorRect);//Scirssor
-	//	commandList->SetGraphicsRootSignature(rootSignature);//RootSignatureを設定
-	//	commandList->SetPipelineState(graphicsPipelineState);//PSOを設定
-	//	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
-	//	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);//形状を設定
+		//	//マテリアルCBufferの場所を設定
+		//	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+		//	//wvp用のCBufferの場所を設定
+		//	commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+		//	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である
+		//	commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
-	//	//マテリアルCBufferの場所を設定
-	//	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-	//	//wvp用のCBufferの場所を設定
-	//	commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-	//	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である
-	//	commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		//	//commandList->DrawInstanced(6, 1, 0, 0);//描画
+		//	//ModelDataの描画
+		//	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
-	//	//commandList->DrawInstanced(6, 1, 0, 0);//描画
-	//	//ModelDataの描画
-	//	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		//	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+		//	*wvpData = worldMatrix;*/
 
-	//	/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	//	*wvpData = worldMatrix;*/
+		//	//Spriteの描画
+		//	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);//VBVを設定
+		//	commandList->IASetIndexBuffer(&indexBufferViewSprite);//IBVを設定
+		//	//TransformMatrixCBufferの場所を設定
+		//	commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+		//	//描画
+		//	//commandList->DrawInstanced(6, 1, 0, 0);
 
-	//	//Spriteの描画
-	//	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);//VBVを設定
-	//	commandList->IASetIndexBuffer(&indexBufferViewSprite);//IBVを設定
-	//	//TransformMatrixCBufferの場所を設定
-	//	commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-	//	//描画
-	//	//commandList->DrawInstanced(6, 1, 0, 0);
-
-	//	//描画
-	//	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		//	//描画
+		//	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 
 
-	//	//実際のcommandListの描画コマンドを積む
-	//	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+		//	//実際のcommandListの描画コマンドを積む
+		//	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 
-	//	//画面の各処理は全て終わり、画面に映すので状態を遷移
-	//	//RenderTargetからPresentにする
-	//	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	//	//TransiionBarrierを張る
-	//	commandList->ResourceBarrier(1, &barrier);
-
-	//	//GPUにコマンドリストの実行を行わせる
-	//	ID3D12CommandList* commandLists[] = { commandList };
-	//	commandQueue->ExecuteCommandLists(1, commandLists);
-	//	//GPUとOSに画面の交換を行うよう通知する
-	//	swapChain->Present(1, 0);
-
-	//	//Fenceの値を更新
-	//	fenceValue++;
-	//	//GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-	//	commandQueue->Signal(fence, fenceValue);
-
-	//	//Fenceの値が指定したSignal値にたどり着いているか確認する
-	//	//GetCompletedValue Fence
-	//	if (fence->GetCompletedValue() < fenceValue)
-	//	{
-	//		//指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
-	//		fence->SetEventOnCompletion(fenceValue, fenceEvent);
-	//		//イベントを待つ
-	//		WaitForSingleObject(fenceEvent, INFINITE);
-	//	}
-
-	//	//次のフレーム用のコマンドリストを準備
-	//	hr = commandAllocator->Reset();
-	//	assert(SUCCEEDED(hr));
-	//	hr = commandList->Reset(commandAllocator, nullptr);
-	//	assert(SUCCEEDED(hr));
-	//}
+		//描画後処理
+		dxBase->PostDraw();
+	}
 
 	////ImGuiの終了処理
 	//ImGui_ImplDX12_Shutdown();
@@ -764,16 +715,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//}
 
 	//入力解放
-
-	}
 	delete input;
 
 	//DirectX解放
 	delete dxBase;
-	//
-	//#ifdef _DEBUG
-	//		debugController->Release();
-	//#endif
+	
+	/*#ifdef _DEBUG
+			debugController->Release();
+	#endif*/
 
 	//WindowsAPIの終了処理
 	windowsAPI->Finalize();

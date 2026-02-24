@@ -45,7 +45,7 @@ public://メンバ変数
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
 
 	//スワップチェーン
-	Microsoft::WRL::ComPtr < IDXGISwapChain1> swapChain = nullptr;
+	Microsoft::WRL::ComPtr < IDXGISwapChain4> swapChain = nullptr;
 
 	//コマンドアロケータ
 	Microsoft::WRL::ComPtr < ID3D12CommandAllocator> commandAllocator = nullptr;
@@ -84,6 +84,11 @@ public://メンバ変数
 
 	//描画後処理
 	void PostDraw();
+
+	// フェンスイベント
+	HANDLE fenceEvent = nullptr;
+	//フェンス値
+	UINT64 fenceVal = 0;
 
 public://外部公開
 	/// <summary>
