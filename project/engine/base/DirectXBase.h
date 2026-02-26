@@ -8,10 +8,15 @@
 #include <dxgi1_6.h>//
 #include <wrl.h>//
 #include <array>
+#include <chrono>
+#include <thread>
 
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include <dxcapi.h>
+
+#include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -29,6 +34,9 @@ public://メンバ変数
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+
+	//DXGIファクトリ
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
 
 	//RTV
 	//D3D12_CPU_DESCRIPTOR_HANDLE rtvDescriptorSize;
@@ -90,6 +98,10 @@ public://メンバ変数
 	//フェンス値
 	UINT64 fenceVal = 0;
 
+	//getter
+	ID3D12Device* GetDevice() const { return device.Get(); }
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+
 public://外部公開
 	/// <summary>
 	/// SRVの指定番号のCPUデスクリプタハンドルを取得する
@@ -100,6 +112,33 @@ public://外部公開
 	/// SRVの指定番号のGPUデスクリプタハンドルを取得する
 	/// </summary>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+
+	/// <summary>
+	/// バッファリソースの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource>CreateBufferResource(size_t sizeInBytes);
+
+	//シェーダーのコンパイル
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
+		const std::wstring& filePath,
+		const wchar_t* profile);
+
+	/// <summary>
+	/// テクスチャリソースの生成関数
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource>CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+	/// <summary>
+	///テクスチャデータの転送
+	/// </summary>
+	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImage);
+
+	/// <summary>
+	/// テクスチャファイルの読み込み
+	/// </summary>
+	///<param name="filePath">テクスチャファイルのパス</param>
+	///<returns>画面イメージデータ</returns>
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 private://プライベート関数
 	//デバイスの初期化
@@ -140,9 +179,6 @@ private://プライベート関数
 
 	//DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
-
-	//DXGIファクトリ
-	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
 	
 	//WindowsAPI
 	WindowsAPI* windowsAPI = nullptr;
@@ -156,4 +192,13 @@ private://プライベート関数
 	///指定番号のGPUデスクリプタハンドルを取得する
 	///</summary>
 	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	
+private://メンバ変数
+	//FPS固定初期化
+	void InitializeFixFPS();
+	//FPS固定更新
+	void UpdateFixFPS();
+
+	//記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
 };

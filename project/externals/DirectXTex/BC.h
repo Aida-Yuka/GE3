@@ -151,7 +151,8 @@ namespace DirectX
 
 #pragma pack(push,1)
 // BC1/DXT1 compression (4 bits per texel)
-    struct D3DX_BC1
+    
+    D3DX_BC1
     {
         uint16_t    rgb[2]; // 565 colors
         uint32_t    bitmap; // 2bpp rgb bitmap
