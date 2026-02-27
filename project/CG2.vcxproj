@@ -167,6 +167,8 @@ copy "$(windowsSdkDir)bin\$(targetPlatformVersion)\x64\dxil.dll" "$(targetDir)dx
     <ClCompile Include="engine\3d\MyMath.cpp" />
     <ClCompile Include="engine\base\StringUtility.cpp" />
     <ClCompile Include="engine\io\WindowsAPI.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -210,6 +212,8 @@ copy "$(windowsSdkDir)bin\$(targetPlatformVersion)\x64\dxil.dll" "$(targetDir)dx
     <ClInclude Include="engine\3d\MyMath.h" />
     <ClInclude Include="engine\base\StringUtility.h" />
     <ClInclude Include="engine\io\WindowsAPI.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteBase.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

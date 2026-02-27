@@ -5,6 +5,8 @@
 #include "Logger.h"
 #include "StringUtility.h"
 #include "D3DResourceLeakChecker.h"
+#include "Sprite.h"
+#include "SpriteBase.h"
 
 #include <format>
 #include <d3d12.h>
@@ -181,6 +183,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//DirectXの初期化
 	dxBase = new DirectXBase();
 	dxBase->Initialize(windowsAPI);
+
+#pragma region 基盤システムの初期化
+
+	SpriteBase* spriteBase = nullptr;
+	//スプライト共通部の初期化
+	spriteBase = new SpriteBase;
+	spriteBase->Initialize(dxBase);
+
+#pragma endregion 基盤システムの初期化
+
+#pragma region 最初のシーンの初期化
+
+	Sprite* sprite = new Sprite();
+	sprite->Initialize(spriteBase);
+
+#pragma endregion 最初のシーンの初期化
 
 	//HRESULTはWindows系のエラーコードであり、関数が成功したかどうかをSUCCEEDEDマクロで判定できる
 	//hr = CreateDXGIFactory(IID_PPV_ARGS(&dxBase->dxgiFactory));
@@ -590,11 +608,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//描画前処理
 		dxBase->PreDraw();
 
-		//コマンドを積む
-		dxBase->commandList->SetGraphicsRootSignature(rootSignature);//RootSignatureを設定
-		dxBase->commandList->SetPipelineState(graphicsPipelineState);//PSOを設定
-		dxBase->commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
-		dxBase->commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);//形状を設定
+		//Spriteの描画準備
+		spriteBase->commonDraw();
 
 		//マテリアルCBufferの場所を設定
 		dxBase->commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
@@ -678,6 +693,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		indexResourceSprite = nullptr;
 	}
 
+	delete sprite;
+	delete spriteBase;
+	
 	//入力解放
 	delete input;
 
