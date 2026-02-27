@@ -33,6 +33,12 @@ struct Transform {
 	Vector3 translate;
 };
 
+struct TransformationMatrix
+{
+	Matrix4x4 world;
+	Matrix4x4 wvp;
+};
+
 struct VertexData
 {
 	Vector4 position;

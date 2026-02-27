@@ -189,6 +189,20 @@ void DirectXBase::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>
 	commandList->Close();
 	ID3D12CommandList* commandLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists(1, commandLists);
+
+	// 2. Fenceで完了通知を送るよう予約
+	fenceVal++;
+	commandQueue->Signal(fence.Get(), fenceVal);
+	// Fenceで待
+	if (fence->GetCompletedValue() < fenceVal)
+	{
+		fence->SetEventOnCompletion(fenceVal, fenceEvent);
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+
+	// 次の命令のためにコマンドリストをリセットしておく
+	commandAllocator->Reset();
+	commandList->Reset(commandAllocator.Get(), nullptr);
 }
 
 //テクスチャファイル読み込み関数

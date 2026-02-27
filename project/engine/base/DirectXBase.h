@@ -13,6 +13,9 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include <dxcapi.h>
 
+#include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
@@ -90,6 +93,12 @@ public://メンバ変数
 	//フェンス値
 	UINT64 fenceVal = 0;
 
+	//DirectX12デバイス
+	Microsoft::WRL::ComPtr<ID3D12Device> device{};
+
+	//DXGIファクトリ
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory{};
+
 public://外部公開
 	/// <summary>
 	/// SRVの指定番号のCPUデスクリプタハンドルを取得する
@@ -100,6 +109,35 @@ public://外部公開
 	/// SRVの指定番号のGPUデスクリプタハンドルを取得する
 	/// </summary>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+
+	//getter
+	ID3D12Device* GetDevice()const { return device.Get(); }
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+
+	//シェーダーのコンパイル
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+
+	/// <summary>
+	/// バッファリソースの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource>CreateBufferResource(size_t sizeInBytes);
+
+	/// <summary>
+	/// テクスチャリソースの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource>CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+	/// <summary>
+	/// テクスチャデータの転送
+	/// </summary>
+	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
+
+	/// <summary>
+	/// テクスチャファイルの読み込み
+	/// </summary>
+	/// <param name="filePath">テクスチャファイルのパス</param>
+	/// <returns>画像イメージデータ</returns>
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 private://プライベート関数
 	//デバイスの初期化
@@ -138,12 +176,6 @@ private://プライベート関数
 	//ImGuiの初期化
 	void ImGuiInitialize();
 
-	//DirectX12デバイス
-	Microsoft::WRL::ComPtr<ID3D12Device> device;
-
-	//DXGIファクトリ
-	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
-	
 	//WindowsAPI
 	WindowsAPI* windowsAPI = nullptr;
 
