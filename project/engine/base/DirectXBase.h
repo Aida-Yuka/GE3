@@ -8,6 +8,7 @@
 #include <dxgi1_6.h>//
 #include <wrl.h>//
 #include <array>
+#include <chrono>
 
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -188,4 +189,13 @@ private://プライベート関数
 	///指定番号のGPUデスクリプタハンドルを取得する
 	///</summary>
 	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	
+private://メンバ変数
+	//FPS固定初期化
+	void InitializeFixFPS();
+	//FPS固定更新
+	void UpdateFixFPS();
+
+	//記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
 };
