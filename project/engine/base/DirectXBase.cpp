@@ -185,10 +185,6 @@ void DirectXBase::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	commandList->ResourceBarrier(1, &barrier);
-
-	commandList->Close();
-	ID3D12CommandList* commandLists[] = { commandList.Get() };
-	commandQueue->ExecuteCommandLists(1, commandLists);
 }
 
 //テクスチャファイル読み込み関数
@@ -713,7 +709,7 @@ void DirectXBase::PostDraw()
 	//GPUにコマンドリストの実行を行わせる
 	ID3D12CommandList* commandLists[] = { commandList.Get()};
 	commandQueue->ExecuteCommandLists(1, commandLists);
-	
+
 	//===GPU画面の交換を通知===
 	//GPUとOSに画面の交換を行うよう通知する
 	swapChain->Present(1, 0);
