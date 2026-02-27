@@ -3,6 +3,8 @@
 #include "DirectXBase.h"
 #include "WindowsAPI.h"
 
+
+
 class SpriteBase
 {
 public://メンバ変数
@@ -25,11 +27,11 @@ public://メンバ変数
 	//共通描画設定
 	void commonDraw();
 
+	DirectXBase* dxBase_;
+
 private:
 	//ルートシグネチャの設定
 	void RootSignatureSetting();
 	//グラフィックスパイプラインを生成
 	void GraphicsPipeline();
-
-	DirectXBase* dxBase_;
 };

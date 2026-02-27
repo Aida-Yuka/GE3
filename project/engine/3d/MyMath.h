@@ -39,10 +39,12 @@ struct TransformationMatrix
 	Matrix4x4 wvp;
 };
 
+//頂点データ
 struct VertexData
 {
 	Vector4 position;
 	Vector2 texcoord;
+	Vector3 normal;
 };
 
 struct MaterialData

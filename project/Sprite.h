@@ -1,15 +1,9 @@
 #pragma once
 #include "MyMath.h"
+#include <d3d12.h>
+#include <wrl.h>
 
 class SpriteBase;
-
-//頂点データ
-struct VertexData
-{
-	Vector4 position;
-	Vector2 texcoord;
-	Vector3 normal;
-};
 
 //マテリアルデータ
 struct Material
@@ -27,10 +21,11 @@ public://メンバ変数
 	void Initialize(SpriteBase* spriteBase);
 
 	SpriteBase* spriteBase = nullptr;
+	MyMath* myMath = nullptr;
 
 	//バッファリソース
-	//void VertexResource(VertexBuffer);
-	//void IndexResource(IndexBuffer);
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource{};
 	//バッファリソース内のデータを指すポインタ
 	VertexData* vertexData = nullptr;
 	uint32_t* indexData = nullptr;
