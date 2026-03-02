@@ -6,7 +6,6 @@ void Sprite::Initialize(SpriteBase* spriteBase)
 	//引数で受け取ってメンバ変数に記録する
 	this->spriteBase = spriteBase;
 
-	///=====頂点リソースの作成=====///
 	//★===VertexResourceを作る===
 	vertexResource = spriteBase->GetDxBase()->CreateBufferResource(sizeof(vertexData) * 4);
 

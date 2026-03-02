@@ -3,19 +3,11 @@
 #include "DirectXBase.h"
 #include "WindowsAPI.h"
 
-
-
 class SpriteBase
 {
 public://メンバ変数
 	//初期化
 	void Initialize(DirectXBase* dxBase);
-
-	//RootSignatureを設定
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	
-	//PSOを生成する
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
 	//getter
 	DirectXBase* GetDxBase()const { return dxBase_; }
@@ -30,6 +22,9 @@ public://メンバ変数
 	DirectXBase* dxBase_;
 
 private:
+	//RootSignatureを設定
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+
 	//ルートシグネチャの設定
 	void RootSignatureSetting();
 	//グラフィックスパイプラインを生成

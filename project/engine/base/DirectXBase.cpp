@@ -565,22 +565,8 @@ void DirectXBase::ImGuiInitialize()
 	ImGui_ImplDX12_Init(device.Get(), swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap.Get(), srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 }
 
-////指定番号のCPUデスクリプタハンドsルを取得
-//D3D12_CPU_DESCRIPTOR_HANDLE DirectXBase::GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
-//{
-//	return D3D12_CPU_DESCRIPTOR_HANDLE();
-//}
-//
-////指定番号のGPUデスクリプタハンドルを取得
-//D3D12_GPU_DESCRIPTOR_HANDLE DirectXBase::GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
-//{
-//	return D3D12_GPU_DESCRIPTOR_HANDLE();
-//}
-
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXBase::GetCPUDescriptorHandle(
-	const ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
-	uint32_t descriptorSize,
-	uint32_t index)
+//指定番号のCPUデスクリプタハンドルを取得
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXBase::GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle =
 		descriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -588,10 +574,8 @@ D3D12_CPU_DESCRIPTOR_HANDLE DirectXBase::GetCPUDescriptorHandle(
 	return handle;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXBase::GetGPUDescriptorHandle(
-	const ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
-	uint32_t descriptorSize,
-	uint32_t index)
+//指定番号のGPUデスクリプタハンドルを取得
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXBase::GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap, uint32_t descriptorSize, uint32_t index)
 {
 	D3D12_GPU_DESCRIPTOR_HANDLE handle =
 		descriptorHeap->GetGPUDescriptorHandleForHeapStart();
