@@ -57,7 +57,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXBase::CompileShader(const std::wstring& 
 		&shaderSourceBuffer,//読み込んだファイル
 		arguments,//コンパイルオプション
 		_countof(arguments),//コンパイルオプションの数々
-		includeHandler,//includeが含まれた諸々
+		includeHandler.Get(),//includeが含まれた諸々
 		IID_PPV_ARGS(&shaderResult)//コンパイル結果
 	);
 	//コンパイルエラーではなくdxcが起動できないなど致命的な状況
@@ -135,7 +135,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXBase::CreateTextureResource(const 
 	//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;//WriteBackポリシーでCPUアクセス可能
 	//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
 	//3.Resourceを生成する
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device.Get()->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
@@ -216,7 +216,7 @@ void DirectXBase::DeviceInitialize()
 
 	//デバッグレイヤー
 #ifdef _DEBUG
-	ID3D12Debug1* debugController = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
 	{
 		//デバッグレイヤーを有効化する
@@ -233,7 +233,7 @@ void DirectXBase::DeviceInitialize()
 	assert(SUCCEEDED(hResult));
 
 	//使用するアダプタ用の変数。最初にnullptrを入れておく
-	IDXGIAdapter4* useAdapter = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
 
 	//良い順にアダプタを頼む
 	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; ++i)
@@ -267,7 +267,7 @@ void DirectXBase::DeviceInitialize()
 	for (size_t i = 0; i < _countof(featureLevels); ++i)
 	{
 		//採用したアダプターでデバイスを生成
-		hResult = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+		hResult = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&device));
 		//指定した機能レベルでデバイスが生成出来たかを確認
 		if (SUCCEEDED(hResult))
 		{
@@ -281,7 +281,7 @@ void DirectXBase::DeviceInitialize()
 	Logger::Log("Complete create D3D12Device!!!\n");
 
 #ifdef _DEBUG
-	ID3D12InfoQueue* infoQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
 	{
 		//やばいエラー時に止まる
@@ -310,7 +310,7 @@ void DirectXBase::DeviceInitialize()
 		infoQueue->PushStorageFilter(&filter);
 
 		//解放
-		infoQueue->Release();
+		//infoQueue->Release();
 	}
 
 #endif
@@ -431,7 +431,7 @@ Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXBase::CreateDescriptorHeap(D
 {
 	HRESULT hResult;
 
-	ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
@@ -498,7 +498,7 @@ void DirectXBase::DepthStencilViewInitialize()
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	//===DSVをデスクリプタヒープの先頭につくる===
 	//DepthStencilTextureをウィンドウのサイズで作成
-	device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	device->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 //フェンスの生成

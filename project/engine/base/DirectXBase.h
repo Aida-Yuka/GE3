@@ -166,16 +166,16 @@ private://メンバ変数
 
 	//===『レンダーターゲットビューの初期化』での生成物===
 	//スワップチェーンから引っ張ってきたリソース(バックバッファ)
-	ID3D12Resource* swapChainResources2[2] = { nullptr };
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources2[2] = { nullptr };
 	//RTVハンドル
 	static const uint32_t kRTVNumber = 2;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[kRTVNumber];
 
 	//深度バッファの成果物
-	ID3D12Resource* depthStencilResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
 
 	//フェンスの成果物
-	Microsoft::WRL::ComPtr < ID3D12Fence> fence = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 
 	//ビューポート矩形の設定
 	D3D12_VIEWPORT viewport{};
@@ -184,9 +184,9 @@ private://メンバ変数
 	D3D12_RECT scissorRect{};
 
 	//DXCコンパイラの生成
-	IDxcUtils* dxcUtils = nullptr;
-	IDxcCompiler3* dxcCompiler = nullptr;
-	IDxcIncludeHandler* includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 
 
 	// フェンスイベント

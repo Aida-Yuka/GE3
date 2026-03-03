@@ -28,11 +28,10 @@ public://メンバ変数
 	void Draw();
 
 	//getter
-	ID3D12Resource* GetVertexBuffer() const { return vertexBuffer.Get(); }
+	Microsoft::WRL::ComPtr<ID3D12Resource> GetVertexBuffer() const { return vertexBuffer.Get(); }
 	Material* GetMaterialData() const { return materialData; }
 
 private:
-	DirectXBase* dxBase = nullptr; 
 	SpriteBase* spriteBase = nullptr;
 	MyMath* myMath = nullptr;
 
@@ -40,7 +39,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialBuffer{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> ConstantBuffer{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixBuffer{};
 	//バッファリソース内のデータを指すポインタ
 	VertexData* vertexData = nullptr;
 	uint32_t* indexData = nullptr;
@@ -49,5 +48,8 @@ private:
 	//バッファリソースの使い道を補足するバッファリソース
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU{};
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU{};
 };
 
