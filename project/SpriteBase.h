@@ -10,7 +10,7 @@ public://メンバ変数
 	void Initialize(DirectXBase* dxBase);
 
 	//getter
-	DirectXBase* GetDxBase()const { return dxBase_; }
+	//D3D12DescriptorHeap* GetDxBase() const { return dxBase_; }
 
 	//rootSigunature
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
@@ -19,14 +19,15 @@ public://メンバ変数
 	//共通描画設定
 	void commonDraw();
 
-	DirectXBase* dxBase_;
+	//getter
+	DirectXBase* GetDirectXBase()const { return dxBase_; }
 
 private:
-	//RootSignatureを設定
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-
 	//ルートシグネチャの設定
 	void RootSignatureSetting();
 	//グラフィックスパイプラインを生成
 	void GraphicsPipeline();
+
+	//DirectXBaseのポインタ
+	DirectXBase* dxBase_;
 };

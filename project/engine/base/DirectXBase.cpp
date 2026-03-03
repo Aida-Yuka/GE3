@@ -75,12 +75,11 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXBase::CompileShader(const std::wstring& 
 	if (errorName) { errorName->Release(); } // 忘れずに解放！
 
 	///＝＝＝4.Compile結果を受け取って返す＝＝＝///
-	IDxcBlob* shaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
 	IDxcBlobUtf16* objectName = nullptr; // こちらも追加
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), &objectName);
 	assert(SUCCEEDED(hr));
 	if (objectName) { objectName->Release(); } // 解放
-
 	//成功したログを出す
 	Logger::Log(StringUtility::ConvertString(L"Compile Succeeded,path:{},profile:{}\n"));
 	//もう使わないリソースを解放
@@ -109,7 +108,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXBase::CreateBufferResource(size_t 
 	//バッファの場合はこれにする決まり
 	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	//実際に頂点リソースを作る
-	ID3D12Resource* vertexResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	HRESULT hr = device.Get()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResource));
 	assert(SUCCEEDED(hr));
 
@@ -187,6 +186,10 @@ void DirectXBase::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
 	commandList->ResourceBarrier(1, &barrier);
+
+	ExcuteCommand();
+	WaitForSignal();
+	CommandReset();
 }
 
 //テクスチャファイル読み込み関数
@@ -724,18 +727,36 @@ void DirectXBase::PostDraw()
 	//TransiionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 
-	//===グラフィックスコマンドをクローズ===
-	commandList->Close();
-
-	//===GPUコマンドの実行===
-	//GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = { commandList.Get()};
-	commandQueue->ExecuteCommandLists(1, commandLists);
+	ExcuteCommand();
 
 	//===GPU画面の交換を通知===
 	//GPUとOSに画面の交換を行うよう通知する
 	swapChain->Present(1, 0);
 
+	
+	WaitForSignal();
+
+	//FPS固定更新
+	UpdateFixFPS();
+
+	CommandReset();
+
+	assert(fenceEvent != nullptr);
+}
+
+void DirectXBase::ExcuteCommand()
+{
+	//===グラフィックスコマンドをクローズ===
+	commandList->Close();
+
+	//===GPUコマンドの実行===
+	//GPUにコマンドリストの実行を行わせる
+	ID3D12CommandList* commandLists[] = { commandList.Get() };
+	commandQueue->ExecuteCommandLists(1, commandLists);
+}
+
+void DirectXBase::WaitForSignal()
+{
 	//===Fenceの値を更新===
 	//Fenceの値を更新
 	fenceVal++;
@@ -744,10 +765,6 @@ void DirectXBase::PostDraw()
 	//GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
 	commandQueue->Signal(fence.Get(), fenceVal);
 
-	//===コマンド完了待ち===
-	//commandQueue->CommandListsを使いキックする
-	//ID3D12CommandList* commandLists[] = { commandList };
-	//commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
 	//実行を待つ
 	//Fenceの値が指定したSignal値にたどり着いているか確認する
 	if (fence->GetCompletedValue() < fenceVal)
@@ -757,18 +774,16 @@ void DirectXBase::PostDraw()
 		//イベントを待つ
 		WaitForSingleObject(fenceEvent, INFINITE);
 	}
+}
 
-	//FPS固定更新
-	UpdateFixFPS();
-
+void DirectXBase::CommandReset()
+{
 	//===コマンドアロケーターのリセット===
 	//allocatorとcommandListResetして次のコマンドを積めるようにする
-	hResult = commandAllocator->Reset();
+	HRESULT hResult = commandAllocator->Reset();
 	assert(SUCCEEDED(hResult));
 
 	//===コマンドリストのリセット===
 	hResult = commandList->Reset(commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hResult));
-
-	assert(fenceEvent != nullptr);
 }
