@@ -7,6 +7,7 @@
 #include "D3DResourceLeakChecker.h"
 #include "Sprite.h"
 #include "SpriteBase.h"
+#include "TextureManager.h"
 
 #include <format>
 #include <d3d12.h>
@@ -184,6 +185,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dxBase = new DirectXBase();
 	dxBase->Initialize(windowsAPI);
 
+	//テクスチャマネージャーの初期化
+	TextureManager::GetInstance()->Initialize(dxBase);
+
+	//Textureを読んで転送する
+	TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
+
 #pragma region 基盤システムの初期化
 
 	SpriteBase* spriteBase = nullptr;
@@ -196,7 +203,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region 最初のシーンの初期化
 
 	Sprite* sprite = new Sprite();
-	sprite->Initialize(spriteBase);
+	sprite->Initialize(spriteBase, "resources/uvChecker.png");
 
 #pragma endregion 最初のシーンの初期化
 
@@ -266,9 +273,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr));
-
-	spriteBase->Initialize(dxBase);
-	sprite->Initialize(spriteBase);
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
@@ -350,32 +354,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 	Matrix4x4 projectionMatrix = myMath->MakePerspectiveFovMatrix(0.45f, float(WindowsAPI::kClientWidth) / float(WindowsAPI::kClientHeight), 0.1f, 100.0f);
-
-	//Textureを読んで転送する
-	DirectX::ScratchImage mipImages = dxBase->LoadTexture("resources/uvChecker.png");
-	//DirectX::ScratchImage mipImages = dxBase->LoadTexture(modelData.material.textureFilePath);
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxBase->CreateTextureResource(metadata);
-	dxBase->UploadTextureData(textureResource, mipImages);
-
-	// SRVの作成
-	//metaDataを基にSRVの設定
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である
-	//先頭はImGuiが使っているのでその次を使う
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxBase->GetSRVCPUDescriptorHandle(1);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = dxBase->GetSRVGPUDescriptorHandle(1);
-	dxBase->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-
-	////ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages, dxBase->GetDevice(), dxBace->commandList);
-	
-	////intermediateResouseをReleaseする
-	//intermediateResource->Release();
 
 	//利用するHeapの設定
 	D3D12_HEAP_PROPERTIES heapProperties{};
@@ -524,6 +502,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	
 	//入力解放
 	delete input;
+
+	//テクスチャマネージャーの初期化
+	TextureManager::GetInstance()->Finalize();
 
 	//DirectX解放
 	delete dxBase;

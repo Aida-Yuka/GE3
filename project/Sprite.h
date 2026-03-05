@@ -1,6 +1,7 @@
 #pragma once
 #include "MyMath.h"
 #include "DirectXBase.h"
+#include "TextureManager.h"
 #include <d3d12.h>
 #include <wrl.h>
 
@@ -19,7 +20,7 @@ class Sprite
 {
 public://メンバ変数
 	//初期化
-	void Initialize(SpriteBase* spriteBase);
+	void Initialize(SpriteBase* spriteBase, std::string textureFilePath);
 
 	//更新
 	void Update();
@@ -51,5 +52,7 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU{};
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU{};
-};
 
+	//テクスチャ番号
+	uint32_t textureIndex = 0;
+};

@@ -77,7 +77,10 @@ public://外部公開
 	/// </summary>
 	/// <param name="filePath">テクスチャファイルのパス</param>
 	/// <returns>画像イメージデータ</returns>
-	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	////static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+	//最大SRV数(最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
 
 private://プライベート関数
 	//デバイスの初期化
@@ -158,7 +161,6 @@ private://メンバ変数
 
 	//コマンドアロケータ
 	Microsoft::WRL::ComPtr < ID3D12CommandAllocator> commandAllocator = nullptr;
-	//commandAllocator = nullptr;
 	//コマンドリスト
 	Microsoft::WRL::ComPtr < ID3D12GraphicsCommandList> commandList = nullptr;
 	//コマンドキュー
@@ -188,7 +190,6 @@ private://メンバ変数
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 
-
 	// フェンスイベント
 	HANDLE fenceEvent = nullptr;
 	//フェンス値
@@ -207,4 +208,6 @@ private://メンバ変数
 
 	//記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_;
+
+	DirectXBase* dxBase_;
 };

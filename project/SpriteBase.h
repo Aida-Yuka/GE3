@@ -28,6 +28,5 @@ private:
 	//グラフィックスパイプラインを生成
 	void GraphicsPipeline();
 
-	//DirectXBaseのポインタ
-	DirectXBase* dxBase_;
+	DirectXBase* dxBase_ = nullptr;
 };

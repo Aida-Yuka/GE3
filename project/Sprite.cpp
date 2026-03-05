@@ -1,7 +1,7 @@
 #include "Sprite.h"
 #include "SpriteBase.h"
 
-void Sprite::Initialize(SpriteBase* spriteBase)
+void Sprite::Initialize(SpriteBase* spriteBase, std::string textureFilePath)
 {
 	//引数で受け取ってメンバ変数に記録する
 	this->spriteBase = spriteBase;
@@ -62,28 +62,8 @@ void Sprite::Initialize(SpriteBase* spriteBase)
 	// 頂点データ回りを一度更新
 	Update();
 
-	// 画像の読み込み
-	DirectX::ScratchImage mipImages = spriteBase->GetDirectXBase()->LoadTexture("resources/uvChecker.png");
-	//DirectX::ScratchImage mipImages = dxBase->LoadTexture(modelData.material.textureFilePath);
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = spriteBase->GetDirectXBase()->CreateTextureResource(metadata);
-	spriteBase->GetDirectXBase()->UploadTextureData(textureResource, mipImages);
-
-	// 読み込んだ画像からSRVの作成
-	// SRVの作成
-	//metaDataを基にSRVの設定
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である
-	//先頭はImGuiが使っているのでその次を使う
-	textureSrvHandleCPU = spriteBase->GetDirectXBase()->GetSRVCPUDescriptorHandle(1);
-	textureSrvHandleGPU = spriteBase->GetDirectXBase()->GetSRVGPUDescriptorHandle(1);
-	spriteBase->GetDirectXBase()->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-
+	//単位行列を書き込んでおく
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 }
 
 void Sprite::Update()
@@ -132,7 +112,7 @@ void Sprite::Draw()
 	//マテリアルCBufferの場所を設定
 	spriteBase->GetDirectXBase()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialBuffer->GetGPUVirtualAddress());
 
-	spriteBase->GetDirectXBase()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	spriteBase->GetDirectXBase()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
 	//描画
 	//spriteBase->GetDxBase()->commandList->DrawInstanced(6, 1, 0, 0);
 	spriteBase->GetDirectXBase()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
