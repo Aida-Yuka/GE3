@@ -12,6 +12,12 @@ struct Matrix4x4 {
 struct Vector2 {
 	float x;
 	float y;
+
+	Vector2& operator+=(const Vector2& v) {
+		x += v.x;
+		y += v.y;
+		return *this;
+	}
 };
 
 struct Vector3 {

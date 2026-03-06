@@ -69,14 +69,21 @@ void Sprite::Initialize(SpriteBase* spriteBase, std::string textureFilePath)
 void Sprite::Update()
 {
 	//頂点リソースにデータを書き込む
-	vertexData[0].position = { 0.0f,360.0f,0.0f,1.0f };//左下
+	vertexData[0].position = { 0.0f,1.0f,0.0f,1.0f };//左下
 	vertexData[0].texcoord = { 0.0f,1.0f };
+	vertexData[0].normal = { 0.0f,0.0f,-1.0f };
+
 	vertexData[1].position = { 0.0f,0.0f,0.0f,1.0f };//左上
 	vertexData[1].texcoord = { 0.0f,0.0f };
-	vertexData[2].position = { 640.0f,360.0f,0.0f,1.0f };//右下
+	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
+	
+	vertexData[2].position = { 1.0f,1.0f,0.0f,1.0f };//右下
 	vertexData[2].texcoord = { 1.0f,1.0f };
-	vertexData[3].position = { 640.0f,0.0f,0.0f,1.0f };//右上
+	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
+	
+	vertexData[3].position = { 1.0f,0.0f,0.0f,1.0f };//右上
 	vertexData[3].texcoord = { 1.0f,0.0f };
+	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
 
 	//インデックスリソースにデータを書き込む
 	indexData[0] = 0;
@@ -86,8 +93,15 @@ void Sprite::Update()
 	indexData[4] = 3;
 	indexData[5] = 2;
 
+	
 	//Transform関数を作る
-	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Transform transform{};
+
+	transform.rotate = { size.x,size.y,1.0f };
+	transform.translate = { position.x,position.y,0.0f };
+	transform.rotate = { 0.0f,0.0f,rotation };
+
+	transform = { {1.0f,1.0f,1.0f}/*transform.scale*/,transform.rotate,transform.translate };
 
 	//TransformからWorldMatrixを作る
 	Matrix4x4 worldMatrix = myMath->MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);

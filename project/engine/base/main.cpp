@@ -202,8 +202,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region 最初のシーンの初期化
 
-	Sprite* sprite = new Sprite();
-	sprite->Initialize(spriteBase, "resources/uvChecker.png");
+	//複数枚描画
+	std::vector<Sprite*> sprites;
+	for (uint32_t i = 0; i < 5; ++i)
+	{
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(spriteBase, "resources/uvChecker.png");
+		sprites.push_back(sprite);
+	}
+	/*Sprite* sprite = new Sprite();
+	sprite->Initialize(spriteBase, "resources/uvChecker.png");*/
 
 #pragma endregion 最初のシーンの初期化
 
@@ -335,13 +343,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ModelData modelData = LoadObjFile("resources", "axis.obj");
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = dxBase->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
 
-	//頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
-	sprite->GetVertexBuffer()->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
-
-	//Transform関数を作る
-	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	////頂点リソースにデータを書き込む
+	//sprite->GetVertexBuffer()->Map(0, nullptr, reinterpret_cast<void**>(sprite->GetVertexData()));
+	//std::memcpy(sprite->GetVertexData(), modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
 
 	//WVP用のリソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = dxBase->CreateBufferResource(sizeof(Matrix4x4));
@@ -360,10 +364,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;//細かい設定を行う
 	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;//WriteBackポリシーでCPUアクセス可能
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
-
-	//heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 
 	///////////
 
@@ -395,22 +395,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			OutputDebugStringA("Hit0\n");
 		}
 
-		Material* material=sprite->GetMaterialData();
+		Material* material = sprite->GetMaterialData();
+		Vector2 position = sprite->GetPosition();
+		float rotation = sprite->GetRotation();
+		Vector4 color = sprite->GetColor();
+		Vector2 size = sprite->GetSize();
 
-		//色の変更機能
-		ImGui::Begin("Settings");
-		ImGui::ColorEdit4("material", &material->color.x, ImGuiColorEditFlags_AlphaPreview);
-		ImGui::DragFloat("rotate.y", &transform.rotate.y, 0.1f);
-		ImGui::DragFloat3("transform", &transform.translate.x, 0.1f);
-		ImGui::DragFloat2("Sprite transform", &transform.translate.x, 1.0f);
-		ImGui::End();
+		////色の変更機能
+		//ImGui::Begin("Settings");
+		//ImGui::ColorEdit4("material", &material->color.x, ImGuiColorEditFlags_AlphaPreview);
+		//ImGui::DragFloat("rotate.y", &transform.translate.x, 0.1f);
+		//ImGui::DragFloat3("transform", &transform.translate.x, 0.1f);
+		//ImGui::DragFloat3("Sprite transform", &transform.translate.x, 1.0f);
+		//ImGui::End();
 
 		//開発用のUIの処理
 		ImGui::ShowDemoWindow();
 
 		//ImGuiの内部コマンドを生成する
 		ImGui::Render();
-
 
 		sprite->Update();
 
@@ -419,24 +422,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//Spriteの描画準備
 		spriteBase->commonDraw();
-		//wvp用のCBufferの場所を設定
-		//dxBase->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+		
+		//座標を変化させる
+		position += Vector2{ 0.1f,0.1f };
+		sprite->SetPosition(position);
 
-		//dxBace->commandList->DrawInstanced(6, 1, 0, 0);//描画
-		//ModelDataの描画
-		//dxBase->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		//角度を変化させる
+		rotation += 0.01f;
+		sprite->SetRotation(rotation);
 
-		/*Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-		*wvpData = worldMatrix;*/
+		//色を変化させる
+		color.x += 0.01f;
+		if (color.x > 1.0f)
+		{
+			color.x -= 1.0f;
+		}
+		sprite->SetColor(color);
 
-		////transform.rotate.y += 0.03f;
-		//Matrix4x4 worldMatrix = myMath->MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-		//Matrix4x4 cameraMatrix = myMath->MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-		//Matrix4x4 viewMatrix = myMath->Inverse(cameraMatrix);
-		//Matrix4x4 projectionMatrix = myMath->MakePerspectiveFovMatrix(0.45f, float(WindowsAPI::kClientWidth) / float(WindowsAPI::kClientHeight), 0.1f, 100.0f);
-		//Matrix4x4 worldViewProjectionMatrix = myMath->Multiply(worldMatrix, myMath->Multiply(viewMatrix, projectionMatrix));
-		//*wvpData = worldViewProjectionMatrix;
+		//サイズを変化させる
+		size.x += 0.1f;
+		size.y += 0.1f;
+		sprite->SetSize(size);
 
+		//複数枚描画
+		for (Sprite* sprite:sprites)
+		{
+			//描画処理
+			sprite->Draw();
+		}
 
 		//描画処理
 		sprite->Draw();
@@ -496,6 +509,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		indexResourceSprite->Release();
 		indexResourceSprite = nullptr;
 	}*/
+
+	for (Sprite*sprite:sprites)
+	{
+		delete sprite;
+	}
 
 	delete sprite;
 	delete spriteBase;
