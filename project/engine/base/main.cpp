@@ -208,9 +208,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	std::vector<Sprite*> sprites;
 	for (uint32_t i = 0; i < 5; ++i)
 	{
-		Sprite* sprite = new Sprite();
-		sprite->Initialize(spriteBase, "resources/uvChecker.png");
-		sprites.push_back(sprite);
+		sprites.push_back(new Sprite());
+		sprites[i]->Initialize(spriteBase, "resources/uvChecker.png");
+
+		sprites[i]->SetPosition({ 100.0f * i, 100.0f });
+		sprites[i]->SetSize({ 64.0f,64.0f });
 	}
 
 #pragma endregion 最初のシーンの初期化
@@ -397,13 +399,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		Material* material = sprite->GetMaterialData();
 
-		////色の変更機能
-		//ImGui::Begin("Settings");
-		//ImGui::ColorEdit4("material", &material->color.x, ImGuiColorEditFlags_AlphaPreview);
-		//ImGui::DragFloat("rotate.y", &transform.translate.x, 0.1f);
-		//ImGui::DragFloat3("transform", &transform.translate.x, 0.1f);
-		//ImGui::DragFloat3("Sprite transform", &transform.translate.x, 1.0f);
-		//ImGui::End();
+		//色の変更機能
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit4("material", &material->color.x, ImGuiColorEditFlags_AlphaPreview);
+		ImGui::DragFloat("rotate.y", &sprite->transform.translate.y, 0.1f);
+		ImGui::DragFloat3("transform", &sprite->transform.translate.x, 0.1f);
+		ImGui::DragFloat2("Sprite transform", &sprite->transform.translate.x, 1.0f);
+		ImGui::End();
 
 		//開発用のUIの処理
 		ImGui::ShowDemoWindow();
@@ -412,6 +414,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		ImGui::Render();
 
 		//描画処理
+		sprite->Update();
 		for (Sprite* sprite : sprites)
 		{
 			sprite->Update();
@@ -449,9 +452,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprite->SetSize(size);
 
 		//描画処理
+		sprite->Draw();
 		for (Sprite* sprite:sprites)
 		{
-			sprite->Draw();
+			for (uint32_t i = 0; i < 5; ++i)
+			{
+				sprites[i]->Draw();
+			}
 		}
 
 		//実際のcommandListの描画コマンドを積む
@@ -471,45 +478,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	CoUninitialize();
 
 	//解放処理
-	//CloseHandle(fenceEvent);
-	//fence->Release();
-	//rtvDescriptorHeap->Release();
-	//swapChainResources[0]->Release();
-	//swapChainResources[1]->Release();
-	//swapChain->Release();
-	//dxBase->GetcommandList()->Release();
-	//commandAllocator->Release();
-	//commandQueue->Release();
-	//useAdapter->Release();
-	//dxgiFactory->Release();
-
-	//vertexResource->Release();
-	//graphicsPipelineState->Release();
-	/*signatureBlob->Release();
-	if (errorBlob)
-	{
-		errorBlob->Release();
-	}*/
-	//rootSignature->Release();
-	//pixelShaderBlob->Release();
-	//vertexShaderBlob->Release();
-
-	//sprite->materialBuffer->Release();
-	//wvpResource->Release();
-
-	//srvDescriptorHeap->Release();
-	//textureResource->Release();
-	//depthStencilResource->Release();
-	//dsvDescriptorHeap->Release();
-
-	/*vertexResourceSprite->Release();
-	transformationMatrixResourceSprite->Release();
-	if (indexResourceSprite)
-	{
-		indexResourceSprite->Release();
-		indexResourceSprite = nullptr;
-	}*/
-
 	delete sprite;
 	for (Sprite*sprite:sprites)
 	{

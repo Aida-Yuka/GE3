@@ -95,13 +95,11 @@ void Sprite::Update()
 
 	
 	//Transform関数を作る
-	Transform transform{};
-
-	transform.rotate = { size.x,size.y,1.0f };
+	transform.scale = { size.x,size.y,1.0f };
 	transform.translate = { position.x,position.y,0.0f };
 	transform.rotate = { 0.0f,0.0f,rotation };
 
-	transform = { {1.0f,1.0f,1.0f}/*transform.scale*/,transform.rotate,transform.translate };
+	transform = { transform.scale,transform.rotate,transform.translate };
 
 	//TransformからWorldMatrixを作る
 	Matrix4x4 worldMatrix = myMath->MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);

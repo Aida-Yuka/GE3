@@ -44,6 +44,8 @@ public://メンバ変数
 	void SetColor(const Vector4 & color) { materialData->color = color; }
 	void SetSize(const Vector2& size) { this->size = size; }
 
+	Transform transform = {};
+
 private:
 	SpriteBase* spriteBase = nullptr;
 	MyMath* myMath = nullptr;
