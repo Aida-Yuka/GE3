@@ -202,6 +202,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region 最初のシーンの初期化
 
+	Sprite* sprite = new Sprite();
+	sprite->Initialize(spriteBase, "resources/uvChecker.png");
 	//複数枚描画
 	std::vector<Sprite*> sprites;
 	for (uint32_t i = 0; i < 5; ++i)
@@ -210,8 +212,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprite->Initialize(spriteBase, "resources/uvChecker.png");
 		sprites.push_back(sprite);
 	}
-	/*Sprite* sprite = new Sprite();
-	sprite->Initialize(spriteBase, "resources/uvChecker.png");*/
 
 #pragma endregion 最初のシーンの初期化
 
@@ -396,10 +396,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 		Material* material = sprite->GetMaterialData();
-		Vector2 position = sprite->GetPosition();
-		float rotation = sprite->GetRotation();
-		Vector4 color = sprite->GetColor();
-		Vector2 size = sprite->GetSize();
 
 		////色の変更機能
 		//ImGui::Begin("Settings");
@@ -415,7 +411,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//ImGuiの内部コマンドを生成する
 		ImGui::Render();
 
-		sprite->Update();
+		//描画処理
+		for (Sprite* sprite : sprites)
+		{
+			sprite->Update();
+		}
 
 		//描画前処理
 		dxBase->PreDraw();
@@ -424,14 +424,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		spriteBase->commonDraw();
 		
 		//座標を変化させる
+		Vector2 position = sprite->GetPosition();
 		position += Vector2{ 0.1f,0.1f };
 		sprite->SetPosition(position);
 
 		//角度を変化させる
+		float rotation = sprite->GetRotation();
 		rotation += 0.01f;
 		sprite->SetRotation(rotation);
 
 		//色を変化させる
+		Vector4 color = sprite->GetColor();
 		color.x += 0.01f;
 		if (color.x > 1.0f)
 		{
@@ -440,19 +443,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprite->SetColor(color);
 
 		//サイズを変化させる
+		Vector2 size = sprite->GetSize();
 		size.x += 0.1f;
 		size.y += 0.1f;
 		sprite->SetSize(size);
 
-		//複数枚描画
+		//描画処理
 		for (Sprite* sprite:sprites)
 		{
-			//描画処理
 			sprite->Draw();
 		}
-
-		//描画処理
-		sprite->Draw();
 
 		//実際のcommandListの描画コマンドを積む
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxBase->GetCommandList());
@@ -510,12 +510,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		indexResourceSprite = nullptr;
 	}*/
 
+	delete sprite;
 	for (Sprite*sprite:sprites)
 	{
 		delete sprite;
 	}
-
-	delete sprite;
 	delete spriteBase;
 	
 	//入力解放
