@@ -137,3 +137,13 @@ void TextureManager::Finalize()
 	delete instance;
 	instance = nullptr;
 }
+
+//メタデータ取得
+const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureIndex)
+{
+	// 範囲外指定違反チェック
+	assert(textureIndex < textureDatas.size());
+
+	TextureData& textureData = textureDatas[textureIndex];
+	return textureData.metadata;
+}

@@ -1,6 +1,16 @@
 #include "Sprite.h"
 #include "SpriteBase.h"
 
+void Sprite::AdjustTextureSize()
+{
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+
+	textureSize.x = static_cast<float>(metadata.width);
+	textureSize.y = static_cast<float>(metadata.height);
+	//画像サイズをテクスチャサイズに合わせる
+	size = textureSize;
+}
+
 void Sprite::Initialize(SpriteBase* spriteBase, std::string textureFilePath)
 {
 	//引数で受け取ってメンバ変数に記録する
@@ -64,25 +74,56 @@ void Sprite::Initialize(SpriteBase* spriteBase, std::string textureFilePath)
 
 	//単位行列を書き込んでおく
 	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+
+	//テクスチャサイズをイメージに合わせる
+	AdjustTextureSize();
 }
 
 void Sprite::Update()
 {
+	//アンカーポイント
+	float left = 0.0f - anchorPoint.x;
+	float right = 1.0f - anchorPoint.x;
+	float top = 0.0f - anchorPoint.y;
+	float bottom = 1.0f - anchorPoint.y;
+
+	//左右反転
+	if (isFlipX_)
+	{
+		left = -left;
+		right = -right;
+	}
+
+	//上下反転
+	if (isFlipY_)
+	{
+		top = -top;
+		bottom = -bottom;
+	}
+
+	//===テクスチャ範囲指定===
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+
+	float tex_left = textureLeftTop.x / metadata.width;
+	float tex_right = (textureLeftTop.x + textureSize.x) / metadata.width;
+	float tex_top = textureLeftTop.y / metadata.height;
+	float tex_bottom = (textureLeftTop.y + textureSize.y) / metadata.height;
+
 	//頂点リソースにデータを書き込む
-	vertexData[0].position = { 0.0f,1.0f,0.0f,1.0f };//左下
-	vertexData[0].texcoord = { 0.0f,1.0f };
+	vertexData[0].position = { left,bottom,0.0f,1.0f };//左下
+	vertexData[0].texcoord = { tex_left,tex_bottom };
 	vertexData[0].normal = { 0.0f,0.0f,-1.0f };
 
-	vertexData[1].position = { 0.0f,0.0f,0.0f,1.0f };//左上
-	vertexData[1].texcoord = { 0.0f,0.0f };
+	vertexData[1].position = { left,top,0.0f,1.0f };//左上
+	vertexData[1].texcoord = { tex_left,tex_top };
 	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
 	
-	vertexData[2].position = { 1.0f,1.0f,0.0f,1.0f };//右下
-	vertexData[2].texcoord = { 1.0f,1.0f };
+	vertexData[2].position = { right,bottom,0.0f,1.0f };//右下
+	vertexData[2].texcoord = { tex_right,tex_bottom };
 	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
 	
-	vertexData[3].position = { 1.0f,0.0f,0.0f,1.0f };//右上
-	vertexData[3].texcoord = { 1.0f,0.0f };
+	vertexData[3].position = { right,top,0.0f,1.0f };//右上
+	vertexData[3].texcoord = { tex_right,tex_top };
 	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
 
 	//インデックスリソースにデータを書き込む
@@ -93,7 +134,6 @@ void Sprite::Update()
 	indexData[4] = 3;
 	indexData[5] = 2;
 
-	
 	//Transform関数を作る
 	transform.scale = { size.x,size.y,1.0f };
 	transform.translate = { position.x,position.y,0.0f };

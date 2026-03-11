@@ -190,6 +190,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//Textureを読んで転送する
 	TextureManager::GetInstance()->LoadTexture("resources/uvChecker.png");
+	TextureManager::GetInstance()->LoadTexture("resources/monsterBall.png");
 
 #pragma region 基盤システムの初期化
 
@@ -204,15 +205,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Sprite* sprite = new Sprite();
 	sprite->Initialize(spriteBase, "resources/uvChecker.png");
+	sprite->Initialize(spriteBase, "resources/monsterBall.png");
 	//複数枚描画
 	std::vector<Sprite*> sprites;
 	for (uint32_t i = 0; i < 5; ++i)
 	{
 		sprites.push_back(new Sprite());
-		sprites[i]->Initialize(spriteBase, "resources/uvChecker.png");
+
+		if (i % 2 == 0)
+		{
+			sprites[i]->Initialize(spriteBase, "resources/uvChecker.png");
+		}
+		else
+		{
+			sprites[i]->Initialize(spriteBase, "resources/monsterBall.png");
+		}
 
 		sprites[i]->SetPosition({ 100.0f * i, 100.0f });
 		sprites[i]->SetSize({ 64.0f,64.0f });
+		sprites[i]->SetAnchorPoint(Vector2(0.5f, 0.5f));
+		sprites[i]->SetTextureSize(Vector2(64.0f + 64.0f*i, 64.0f + 64.0f * i));
+		sprites[i]->SetIsFilpY(true);
+		sprites[i]->SetIsFilpX(true);
 	}
 
 #pragma endregion 最初のシーンの初期化
@@ -415,9 +429,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//描画処理
 		sprite->Update();
-		for (Sprite* sprite : sprites)
+		for (Sprite* s : sprites)
 		{
-			sprite->Update();
+			s->Update();
 		}
 
 		//描画前処理
@@ -426,30 +440,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//Spriteの描画準備
 		spriteBase->commonDraw();
 		
-		//座標を変化させる
-		Vector2 position = sprite->GetPosition();
-		position += Vector2{ 0.1f,0.1f };
-		sprite->SetPosition(position);
+		////座標を変化させる
+		//Vector2 position = sprite->GetPosition();
+		//position += Vector2{ 0.1f,0.1f };
+		//sprite->SetPosition(position);
 
 		//角度を変化させる
-		float rotation = sprite->GetRotation();
+		/*float rotation = sprite->GetRotation();
 		rotation += 0.01f;
-		sprite->SetRotation(rotation);
+		sprite->SetRotation(rotation);*/
 
-		//色を変化させる
-		Vector4 color = sprite->GetColor();
-		color.x += 0.01f;
-		if (color.x > 1.0f)
-		{
-			color.x -= 1.0f;
-		}
-		sprite->SetColor(color);
+		////色を変化させる
+		//Vector4 color = sprite->GetColor();
+		//color.x += 0.01f;
+		//if (color.x > 1.0f)
+		//{
+		//	color.x -= 1.0f;
+		//}
+		//sprite->SetColor(color);
 
-		//サイズを変化させる
-		Vector2 size = sprite->GetSize();
-		size.x += 0.1f;
-		size.y += 0.1f;
-		sprite->SetSize(size);
+		////サイズを変化させる
+		//Vector2 size = sprite->GetSize();
+		//size.x += 0.1f;
+		//size.y += 0.1f;
+		//sprite->SetSize(size);
 
 		//描画処理
 		sprite->Draw();

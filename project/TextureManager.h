@@ -34,6 +34,9 @@ public:
 	//終了
 	void Finalize();
 
+	//メタデータを取得
+	const DirectX::TexMetadata& GetMetaData(uint32_t textureIndex);
+
 private:
 	//シングルトン
 	static uint32_t kSRVIndexTop;
