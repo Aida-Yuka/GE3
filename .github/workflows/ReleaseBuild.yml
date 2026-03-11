@@ -17,9 +17,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v4
+      uses: microsoft/setup-msbuild@v2
       with:
        msbuild-architecture: x64
     - name: Build
-      run: |
+      run:
        msbuild ${{env.SOLUTION_FILE_PATH}} /p:Platform=x64,Configuration-${{env.CONFIGURATION}}
